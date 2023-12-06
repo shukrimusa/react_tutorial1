@@ -8,13 +8,23 @@ import {useState} from 'react';
 import {useEffect} from 'react';
 
 function App() {
+
+
+  const API_URL = 'http://localhost:3500/items';
+
   // Using useStates Here
+  const [loading, setLoading]  = useState(true)
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [newItem, setNewItem] = useState('');
 
+  // Stage 3 for Items using JSON server
+  const [items, setItems] = useState([]);
+
+  /*
   // Stage 2 for Items using localStorage
   const [items, setItems] = useState(JSON.parse(localStorage.getItem('shoppinglist')) || []);
-
+  */
   /*
   // stage 1 for Items using default Items
   const [items, setItems] = useState([
@@ -35,15 +45,39 @@ function App() {
     }
 ]);
 */
-console.log("Before useEffect")
 // Using useEffect Here
+/*
+// Use Effect to save items into local storage each time Items change.
 useEffect(() => {
   console.log("Inside UseEffect")
   // Save Items in Local Storage
   localStorage.setItem('shoppinglist', JSON.stringify(items));
 }, [items]);
+*/
 
-console.log("After useEffect")
+useEffect(() => {
+  const fetchItems = async () => {
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) throw Error("Error!");
+      const listItems = await response.json();
+      setItems(listItems);
+      setError(null)
+    } catch(err) {
+      setError(err.message)
+    }finally{
+      setLoading(false)
+    }
+  }
+ 
+  //(async () => await fetchItems())();
+  setTimeout(() => {
+       fetchItems();
+  }, 2000);
+}, []);
+
+
+
  // checkBox function
  const checkBox = (id) => {
   const newItems = items.map((item) => 
@@ -98,11 +132,17 @@ const submitItem = (e) => {
      search = {search}
      setSearch = {setSearch}
      />
-     <Main 
+     <main>
+      <p style={{color: "red", textAlign: "center"}}>{error}</p>
+      {loading &&<p style={{textAlign: "Center"}}>Loading...</p>}
+      
+
+     {!error && !loading && <Main 
      items= {items.filter((item) => ((item.name).toLowerCase()).includes(search.toLowerCase()))}
      checkBox = {checkBox}
      deleteItem = {deleteItem}
-     />
+     /> }
+     </main> 
      <Footer number={items.length}/>
     </div>
   );

@@ -5,7 +5,7 @@ import ListItems from './ListItems';
 function Main({items, checkBox, deleteItem}) {
     // Return (jsx)
     return(
-        <main>
+        <>
 
             {items.length ? 
             <ListItems
@@ -15,7 +15,7 @@ function Main({items, checkBox, deleteItem}) {
             /> : <h2 style={{margin: '2rem', textAlign: 'center'}}
          >List is empty!</h2>}
             
-        </main>
+        </>
     )
 }
 
