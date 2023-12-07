@@ -6,6 +6,7 @@ import Main from './Main';
 import Footer from './Footer';
 import {useState} from 'react';
 import {useEffect} from 'react';
+import aipRequest from './apiRequest';
 
 function App() {
 
@@ -55,6 +56,7 @@ useEffect(() => {
 }, [items]);
 */
 
+// read
 useEffect(() => {
   const fetchItems = async () => {
     try {
@@ -78,36 +80,64 @@ useEffect(() => {
 
 
 
- // checkBox function
- const checkBox = (id) => {
+ // checkBox function(update)
+ const checkBox = async(id) => {
   const newItems = items.map((item) => 
   item.id == id ? {...item, checked: !item.checked} :item);
-  setItems(newItems) // Items = newItems
-
+  setItems(newItems)// Items = newItems
 
   // Save newItems in Local Storage
   // localStorage.setItem('shoppinglist', JSON.stringify(newItems));
+
+// Stage 3 For Json server
+  const checkedItem = newItems.filter((item) => item.id == id);
+  const updateO = {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({checked: checkedItem[0].checked})
+  }
+  const reqUrl = `${API_URL}/${id}`;
+  const result = await aipRequest(reqUrl, updateO);
+  if (result) setError(result);
 };
 
-// deleteItem function
-const deleteItem = (id) => {
+// deleteItem function(delete)
+const deleteItem = async(id) => {
    const newItems = items.filter((item) => item.id != id);
    setItems(newItems); // Items = newItems
 
    // Save newItems in Local Storage
    // localStorage.setItem('shoppinglist', JSON.stringify(newItems));  
 
+   // Stage 3 For Json server
+   const deleteO = {method: 'DELETE'};
+   const reqUrl = `${API_URL}/${id}`;
+   const result = await aipRequest(reqUrl, deleteO);
+   if(result) setError(result);
 }
 
 
-// addItem function
-const addItem = (name) => {
+// addItem function(create)
+const addItem = async(name) => {
   const id = items.length ? items[items.length - 1].id + 1 : 1;
   const newElement = {id, checked: false, name }
   const newItems = [...items, newElement];
   setItems(newItems)
   // Save newItems in Local Storage
   // localStorage.setItem('shoppinglist', JSON.stringify(newItems)); 
+
+  // Stage 3 For Json server
+const postO = {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(newElement)
+}
+const result = await aipRequest(API_URL, postO);
+if (result) setError(result);
 }
 
 
